@@ -2,6 +2,11 @@
 
 package lesson1
 
+import java.io.File
+import java.io.IOException
+import java.lang.StringBuilder
+import java.util.Arrays
+
 /**
  * Сортировка времён
  *
@@ -30,8 +35,29 @@ package lesson1
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val intTimes = mutableListOf<Int>()
+    for (line in File(inputName).readLines()) {
+        if (lineToInt(line) == -1) {
+            throw IOException()
+        }
+        intTimes.add(lineToInt(line))
+    }
+    val sortedTimes = intTimes.toIntArray()
+    heapSort(sortedTimes) //значение не имеет, но это, вроде, самая быстрая сортировка в данном случае
+    val writer = File(outputName).bufferedWriter()
+    for (seconds in sortedTimes) {
+        writer.write(String.format("%02d:%02d:%02d", seconds / 3600, seconds % 3600 / 60, seconds % 60) + "\n")
+    }
+    writer.close()
+}
+
+fun lineToInt(str: String): Int {
+    val strTime = str.split(":")
+    var timeInSeconds = 0
+    for (part in strTime) timeInSeconds = timeInSeconds * 60 + part.toInt()
+    return timeInSeconds
 }
 
 /**
@@ -61,8 +87,32 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    val streets = mutableMapOf<String, MutableList<String>>()
+    val format = Regex("^[А-я]+ [А-я]+ - [А-я, ]+ [0-9]+\$") //соблюдение формата
+
+    for (line in File(inputName).readLines()) {
+        if (!line.matches(format)) throw IOException()
+        val streetAndName = line.split(" - ")
+        val name = streetAndName[0]
+        val street = streetAndName[1]
+        if (street in streets) {
+            val listOfNames = streets.getOrPut((street)) { mutableListOf() } //подсказали. пытался сделать с getOrDefault. Спросить на лекции
+            listOfNames.add(name) //имя добавляется в значение ключа(улицы)
+        } else streets.put(street, mutableListOf(name))
+
+        val sortedMap = streets.toSortedMap() //сортированные по ключам улицы
+        val writer = File(outputName).bufferedWriter()
+
+        for (street in sortedMap) {
+            street.value.sort()
+            val sorted = street.value
+            writer.write(street.key + " - " +
+                    "$sorted".replace("[","").replace("]","") + "\n")
+        }
+        writer.close()
+    }
 }
+
 
 /**
  * Сортировка температур
@@ -146,6 +196,8 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    TODO()
+    for (i in 0..first.size - 1) second[i] = first[i] //Не могу понять, как написать с одной строчки. Спросить на лекции
+    Arrays.sort(second)
 }
+
 
