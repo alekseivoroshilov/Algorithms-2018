@@ -190,9 +190,9 @@ fun sortTemperatures(inputName: String, outputName: String) { //T=O(NlogN)? || T
  * 2
  */
 fun sortSequence(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
-    val arr = File(inputName).readLines().map { x -> x.toInt() }.toTypedArray()
+    /*val arr = File(inputName).readLines().map { it.toInt() }.toTypedArray()
     arr.sort()
-
+    */
 }
 
 /**
