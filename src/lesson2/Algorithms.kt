@@ -2,6 +2,8 @@
 
 package lesson2
 
+import java.io.File
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -26,8 +28,19 @@ package lesson2
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+// T = O(n^2) ?   /// Не хотел решать ожидаемым перебором. Есть ли способ эффективнее?
 fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
-    TODO()
+    val stockList = File(inputName).readLines().map { line -> line.toInt() }.toTypedArray()
+    var sum = 0
+    var pair = Pair(0, 1)
+
+    for (i in 0..stockList.size - 2){
+        for (j in i + 1..stockList.size-1){
+            System.out.println(Pair(i, j))
+            if (stockList[j] - stockList[i] > sum) {pair = Pair(i, j); sum = stockList[j] - stockList[i]}
+        }
+    }
+    return pair
 }
 
 /**
@@ -76,8 +89,12 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  * Х   Х
  * Х х Х
  */
+//T = O(n)
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
-    TODO()
+    var marker = 1
+    for (i in 1.. menNumber) marker = (marker + choiceInterval) % i
+
+    return marker + 1
 }
 
 /**

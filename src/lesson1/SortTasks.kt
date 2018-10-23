@@ -36,7 +36,7 @@ import java.util.Arrays
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 
-fun sortTimes(inputName: String, outputName: String) {
+fun sortTimes(inputName: String, outputName: String) { //T=O(NlogN);R=O(2N)
     val intTimes = mutableListOf<Int>()
     for (line in File(inputName).readLines()) {
         if (lineToInt(line) == -1) {
@@ -86,7 +86,7 @@ fun lineToInt(str: String): Int {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
-fun sortAddresses(inputName: String, outputName: String) {
+fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(2N)
     val streets = mutableMapOf<String, MutableList<String>>()
     val format = Regex("^[А-я]+ [А-я]+ - [А-я, ]+ [0-9]+\$") //соблюдение формата
 
@@ -144,8 +144,20 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
-fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+fun sortTemperatures(inputName: String, outputName: String) { //T=O(NlogN)? || T=O(N^2)?;R=O(N)
+    val lines = File(inputName).readLines()
+    val temperatures = ArrayList<Double>()
+    for (line in lines){
+        val temperature = line.toDouble()
+        temperatures.add(temperature)
+    }
+    temperatures.sort()
+    val writer = File(outputName).bufferedWriter()
+    for (line in temperatures) {
+        writer.write(line.toString())
+        writer.newLine()
+    }
+    writer.close()
 }
 
 /**
@@ -177,8 +189,10 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
-fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+fun sortSequence(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
+    val arr = File(inputName).readLines().map { x -> x.toInt() }.toTypedArray()
+    arr.sort()
+
 }
 
 /**
@@ -195,8 +209,8 @@ fun sortSequence(inputName: String, outputName: String) {
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
-fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    for (i in 0..first.size - 1) second[i] = first[i] //Не могу понять, как написать с одной строчки. Спросить на лекции
+fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) { //T=O(N);R=O(1)
+    for (i in 0..first.size - 1) second[i] = first[i] //
     Arrays.sort(second)
 }
 
