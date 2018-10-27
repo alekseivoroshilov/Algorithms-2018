@@ -28,19 +28,9 @@ import java.io.File
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
-// T = O(n^2) ?   /// Не хотел решать ожидаемым перебором. Есть ли способ эффективнее?
+// T = O(n^2)
 fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
-    val stockList = File(inputName).readLines().map { line -> line.toInt() }.toTypedArray()
-    var sum = 0
-    var pair = Pair(0, 1)
-
-    for (i in 0..stockList.size - 2){
-        for (j in i + 1..stockList.size-1){
-            System.out.println(Pair(i, j))
-            if (stockList[j] - stockList[i] > sum) {pair = Pair(i, j); sum = stockList[j] - stockList[i]}
-        }
-    }
-    return pair
+    TODO()
 }
 
 /**
@@ -89,7 +79,7 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  * Х   Х
  * Х х Х
  */
-//T = O(n)
+//T = O(n), R = O(menNumber)
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
     var marker = 1
     for (i in 1.. menNumber) marker = (marker + choiceInterval) % i
@@ -108,8 +98,28 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * Если имеется несколько самых длинных общих подстрок одной длины,
  * вернуть ту из них, которая встречается раньше в строке first.
  */
-fun longestCommonSubstring(first: String, second: String): String {
-    TODO()
+fun longestCommonSubstring(first: String, second: String): String { //T = O(first*second), R = O(first*second)
+    var maxLen = 0
+    var maxWordIndexes = Pair(-1, -1)
+    val firstLen = first.length
+    val secondLen = second.length
+
+    val field = List(firstLen + 1) { it -> MutableList(secondLen + 1) { 0 } }
+
+    for (i in 1..firstLen) {
+        for (j in 1..secondLen) {
+            if (first[i - 1] == second[j - 1]) {
+                field[i][j] = field[i - 1][j - 1] + 1
+                if (field[i][j] > maxLen) {
+                    maxLen = field[i][j]
+                    maxWordIndexes = Pair(i - 1, j - 1)
+                }
+            }
+        }
+    }
+
+    if (maxWordIndexes.first == -1) return ""
+    return first.substring(maxWordIndexes.first - maxLen + 1, maxWordIndexes.first + 1)
 }
 
 /**
@@ -122,8 +132,22 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
  */
-fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+fun calcPrimesNumber(limit: Int): Int { //T = O(n/2 + n^(0.5)), R = O(n)    (?)
+    //помню эту задачу. Кажется, она решалась проще, но я не смог вспомнить как
+    var result = 0
+    if (limit >= 2) result++
+    if (limit >= 3) result++
+    for (i in 5..limit step 2) {
+        if (isPrime(i)) result++
+    }
+    return result
+}
+
+fun isPrime(n: Int): Boolean {
+    for (m in 2..Math.sqrt(n.toDouble()).toInt()) {
+        if (n % m == 0) return false
+    }
+    return true
 }
 
 /**

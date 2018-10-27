@@ -4,6 +4,7 @@ package lesson1
 
 import java.io.File
 import java.io.IOException
+import java.lang.IndexOutOfBoundsException
 import java.lang.StringBuilder
 import java.util.Arrays
 
@@ -36,12 +37,11 @@ import java.util.Arrays
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 
-fun sortTimes(inputName: String, outputName: String) { //T=O(NlogN);R=O(2N)
+fun sortTimes(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
     val intTimes = mutableListOf<Int>()
+    val format = Regex("^(([0,1][0-9])|(2[0-3])):[0-5][0-9]:[0-5][0-9]\\\$")
     for (line in File(inputName).readLines()) {
-        if (lineToInt(line) == -1) {
-            throw IOException()
-        }
+        if (line.matches(format)) throw IOException()
         intTimes.add(lineToInt(line))
     }
     val sortedTimes = intTimes.toIntArray()
@@ -86,8 +86,8 @@ fun lineToInt(str: String): Int {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
-fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(2N)
-    val streets = mutableMapOf<String, MutableList<String>>()
+fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
+    val streets = sortedMapOf<String, MutableList<String>>()
     val format = Regex("^[А-я]+ [А-я]+ - [А-я, ]+ [0-9]+\$") //соблюдение формата
 
     for (line in File(inputName).readLines()) {
@@ -100,10 +100,9 @@ fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(2N)
             listOfNames.add(name) //имя добавляется в значение ключа(улицы)
         } else streets.put(street, mutableListOf(name))
 
-        val sortedMap = streets.toSortedMap() //сортированные по ключам улицы
         val writer = File(outputName).bufferedWriter()
 
-        for (street in sortedMap) {
+        for (street in streets) {
             street.value.sort()
             val sorted = street.value
             writer.write(street.key + " - " +
@@ -144,20 +143,36 @@ fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(2N)
  * 99.5
  * 121.3
  */
-fun sortTemperatures(inputName: String, outputName: String) { //T=O(NlogN)? || T=O(N^2)?;R=O(N)
+fun sortTemperatures(inputName: String, outputName: String) { //T=O(NlogN) ; R=O(N)
+// функцию можно сократить, но в таком виде удобнее проверять
     val lines = File(inputName).readLines()
-    val temperatures = ArrayList<Double>()
+    if (lines.equals(null)) throw IllegalArgumentException()
+    val temperatures = ArrayList<Int>()
     for (line in lines){
         val temperature = line.toDouble()
-        temperatures.add(temperature)
+        if (temperature < -273.0 || temperature > 500.0) throw IllegalArgumentException()
+        temperatures.add((temperature * 10).toInt() + 2730) //желательна сортирвока положительных значений
     }
-    temperatures.sort()
+    countingSort(temperatures)  // Вы были правы. Сортировка подсчётом могла бы сделать всё намного быстрее
+
     val writer = File(outputName).bufferedWriter()
     for (line in temperatures) {
-        writer.write(line.toString())
-        writer.newLine()
+        writer.write(((line - 2730).toDouble() / 10.0).toString() + System.lineSeparator())
     }
     writer.close()
+}
+
+fun countingSort(temperatures: ArrayList<Int>) {
+    val min = temperatures.min()!!
+    val max = temperatures.max()!!
+    val c: Array<Int> = Array(max - min + 1, {0})
+    for (number in temperatures) c[number - min]++
+    var pos = 0
+    for (i in min..max)
+        while (c[i - min] > 0) {
+            temperatures[pos++] = i
+            c[i - min]--
+        }
 }
 
 /**
@@ -189,10 +204,8 @@ fun sortTemperatures(inputName: String, outputName: String) { //T=O(NlogN)? || T
  * 2
  * 2
  */
-fun sortSequence(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
-    /*val arr = File(inputName).readLines().map { it.toInt() }.toTypedArray()
-    arr.sort()
-    */
+fun sortSequence(inputName: String, outputName: String) {
+    TODO()
 }
 
 /**
@@ -207,11 +220,35 @@ fun sortSequence(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
  * first = [4 9 15 20 28]
  * second = [null null null null null 1 3 9 13 18 23]
  *
- * Результат: second = [1 3 4 9 9 13 15 20 23 28]
+ * Результат: second = [1 3 4 9 9 13 15 18 20 23 28]
  */
-fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) { //T=O(N);R=O(1)
-    for (i in 0..first.size - 1) second[i] = first[i] //
-    Arrays.sort(second)
+fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) { //T=O(N);R=O(N + 2)
+// мог ли я сделать это задание проще без ветвления? Попытался попробовать сам
+    val partOfSecArray = second.toList().subList(first.size, second.size)
+    var i = 0
+    var j = 0
+
+    for (resultArrayIndex in 0 until second.size - 1) {
+        val resultOfCompare = first[i].compareTo(partOfSecArray[j]!!)
+        if (resultOfCompare > 0) {
+            second[resultArrayIndex] = partOfSecArray[j]
+            j++
+            if (j == partOfSecArray.size) { // если пройден один из массивов first, как на 8 строк ниже,
+                // или second, как в этом блоке, то достаточно
+                // добавить оставшиеся элементы в массив результата
+                // без сравнения
+                for (elemLeftInFirstArray in i until first.size - 1)
+                    second[elemLeftInFirstArray + j] = first[elemLeftInFirstArray]
+                break;
+            }
+        } else {
+            second[resultArrayIndex] = first[i]
+            i++
+            if (i == first.size) {
+                for (elemLeftInSecondArray in j until partOfSecArray.size - 1)
+                    second[elemLeftInSecondArray + i] = partOfSecArray[elemLeftInSecondArray]
+                break;
+            }
+        }
+    }
 }
-
-

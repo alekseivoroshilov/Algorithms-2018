@@ -39,6 +39,27 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        try {
+            sortTimes("input/time_in4.txt", "temp.txt")
+            assertFileContent("temp.txt",
+                    """
+                        00:00:00
+                        01:55:55
+                        02:44:55
+                        02:45:55
+                        02:53:55
+                        02:55:55
+                        02:55:55
+                        23:59:59
+                    """.trimIndent())
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            sortTimes("input/time_in5.txt", "temp.txt")
+            throw Exception()
+        } catch (e: Exception) {
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
@@ -50,6 +71,16 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                     Железнодорожная 3 - Петров Иван
                     Железнодорожная 7 - Иванов Алексей, Иванов Михаил
                     Садовая 5 - Сидоров Петр, Сидорова Мария
+                """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            sortAddresses("input/addr_in2.txt", "temp.txt")
+            assertFileContent("temp.txt",
+                    """
+                    Сбывшиесянадежды 3 - Зачет Операционныесистемы, Зачет Программирование, Зачет Схемотехника
                 """.trimIndent()
             )
         } finally {
@@ -114,6 +145,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         }
         testGeneratedTemperatures(10)
         testGeneratedTemperatures(500)
+        testGeneratedTemperatures(1000)
     }
 
     protected fun sortSequence(sortSequence: (String, String) -> Unit) {
