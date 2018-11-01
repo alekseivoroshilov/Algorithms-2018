@@ -5,6 +5,7 @@ package lesson1
 import java.io.File
 import java.io.IOException
 import java.lang.IndexOutOfBoundsException
+import java.lang.Math.abs
 import java.lang.StringBuilder
 import java.util.Arrays
 
@@ -96,7 +97,7 @@ fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
         val name = streetAndName[0]
         val street = streetAndName[1]
         if (street in streets) {
-            val listOfNames = streets.getOrPut((street)) { mutableListOf() } //подсказали. пытался сделать с getOrDefault. Спросить на лекции
+            val listOfNames = streets.getOrPut((street)) { mutableListOf() }
             listOfNames.add(name) //имя добавляется в значение ключа(улицы)
         } else streets.put(street, mutableListOf(name))
 
@@ -143,37 +144,21 @@ fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
  * 99.5
  * 121.3
  */
-fun sortTemperatures(inputName: String, outputName: String) { //T=O(NlogN) ; R=O(N)
-// функцию можно сократить, но в таком виде удобнее проверять
-    val lines = File(inputName).readLines()
-    if (lines.equals(null)) throw IllegalArgumentException()
-    val temperatures = ArrayList<Int>()
-    for (line in lines){
-        val temperature = line.toDouble()
-        if (temperature < -273.0 || temperature > 500.0) throw IllegalArgumentException()
-        temperatures.add((temperature * 10).toInt() + 2730) //желательна сортирвока положительных значений
-    }
-    countingSort(temperatures)  // Вы были правы. Сортировка подсчётом могла бы сделать всё намного быстрее
+
+fun sortTemperatures(inputName: String, outputName: String) { //T=O(N) ; R= O(N+K), где k -> массив в той сортировке
+    if (!File(inputName).exists()) throw IOException()
+
+    val lines = File(inputName).readLines().map { ((it.toDouble() * 10 + 2730)).toInt() }.toIntArray()
+    //желательна сортирвока положительных значений
+    val temperatures = countingSort(lines, 7730)
 
     val writer = File(outputName).bufferedWriter()
     for (line in temperatures) {
-        writer.write(((line - 2730).toDouble() / 10.0).toString() + System.lineSeparator())
+        writer.write(((line - 2730) / 10.0).toString() + System.lineSeparator())
     }
     writer.close()
 }
 
-fun countingSort(temperatures: ArrayList<Int>) {
-    val min = temperatures.min()!!
-    val max = temperatures.max()!!
-    val c: Array<Int> = Array(max - min + 1, {0})
-    for (number in temperatures) c[number - min]++
-    var pos = 0
-    for (i in min..max)
-        while (c[i - min] > 0) {
-            temperatures[pos++] = i
-            c[i - min]--
-        }
-}
 
 /**
  * Сортировка последовательности
