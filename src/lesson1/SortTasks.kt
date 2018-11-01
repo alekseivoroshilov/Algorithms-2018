@@ -208,14 +208,14 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 18 20 23 28]
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) { //T=O(N);R=O(N + 2)
-// мог ли я сделать это задание проще без ветвления? Попытался попробовать сам
+/*
     val partOfSecArray = second.toList().subList(first.size, second.size)
     var i = 0
     var j = 0
 
     for (resultArrayIndex in 0 until second.size - 1) {
-        val resultOfCompare = first[i].compareTo(partOfSecArray[j]!!)
-        if (resultOfCompare > 0) {
+        //val resultOfCompare = first[i].compareTo(partOfSecArray[j]!!)
+        if (first[i].compareTo(partOfSecArray[j]!!) > 0) {
             second[resultArrayIndex] = partOfSecArray[j]
             j++
             if (j == partOfSecArray.size) { // если пройден один из массивов first, как на 8 строк ниже,
@@ -233,6 +233,33 @@ fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) { //T=O(
                 for (elemLeftInSecondArray in j until partOfSecArray.size - 1)
                     second[elemLeftInSecondArray + i] = partOfSecArray[elemLeftInSecondArray]
                 break;
+            }
+        }
+    }
+}*/
+    val partOfSecArray = second.toList().subList(first.size, second.size)
+    var i = 0
+    var j = 0
+    loop@for(resultArrayIndex in 0..second.size - 1) {
+        try {
+            if (first[i].compareTo(partOfSecArray[j]!!) > 0) {
+                second[resultArrayIndex] = partOfSecArray[j]
+                j++
+            } else {
+                second[resultArrayIndex] = first[i]
+                i++
+            }
+        } catch (e: IndexOutOfBoundsException) {
+            System.out.println("catched")
+            if (i == first.size) {
+                for (indexSecond in j until partOfSecArray.size - 1)
+                    second[indexSecond + i] = partOfSecArray[indexSecond]
+                break@loop
+            }
+            else {
+                for (indexFirst in i until first.size - 1)
+                    second[indexFirst + j] = first[indexFirst]
+                break@loop
             }
         }
     }
