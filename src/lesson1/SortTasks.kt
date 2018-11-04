@@ -107,7 +107,7 @@ fun sortAddresses(inputName: String, outputName: String) { //T=O(NlogN);R=O(N)
             street.value.sort()
             val sorted = street.value
             writer.write(street.key + " - " +
-                    "$sorted".replace("[","").replace("]","") + "\n")
+                    "$sorted".replace("[", "").replace("]", "") + "\n")
         }
         writer.close()
     }
@@ -208,39 +208,12 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 18 20 23 28]
  */
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) { //T=O(N);R=O(N + 2)
-/*
     val partOfSecArray = second.toList().subList(first.size, second.size)
+    // Тест проходит только через раз-два (может, генерация рандомных чисел?)
+    //возможно, программный сбой у меня
     var i = 0
     var j = 0
-
-    for (resultArrayIndex in 0 until second.size - 1) {
-        //val resultOfCompare = first[i].compareTo(partOfSecArray[j]!!)
-        if (first[i].compareTo(partOfSecArray[j]!!) > 0) {
-            second[resultArrayIndex] = partOfSecArray[j]
-            j++
-            if (j == partOfSecArray.size) { // если пройден один из массивов first, как на 8 строк ниже,
-                // или second, как в этом блоке, то достаточно
-                // добавить оставшиеся элементы в массив результата
-                // без сравнения
-                for (elemLeftInFirstArray in i until first.size - 1)
-                    second[elemLeftInFirstArray + j] = first[elemLeftInFirstArray]
-                break;
-            }
-        } else {
-            second[resultArrayIndex] = first[i]
-            i++
-            if (i == first.size) {
-                for (elemLeftInSecondArray in j until partOfSecArray.size - 1)
-                    second[elemLeftInSecondArray + i] = partOfSecArray[elemLeftInSecondArray]
-                break;
-            }
-        }
-    }
-}*/
-    val partOfSecArray = second.toList().subList(first.size, second.size)
-    var i = 0
-    var j = 0
-    loop@for(resultArrayIndex in 0..second.size - 1) {
+    loop@ for (resultArrayIndex in 0..second.size - 1) {
         try {
             if (first[i].compareTo(partOfSecArray[j]!!) > 0) {
                 second[resultArrayIndex] = partOfSecArray[j]
@@ -251,12 +224,14 @@ fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) { //T=O(
             }
         } catch (e: IndexOutOfBoundsException) {
             System.out.println("catched")
+            System.out.println(resultArrayIndex)
+            System.out.println(i.toString() + " " + first.size.toString())
+            System.out.println(j.toString() + " " + partOfSecArray.size.toString())
             if (i == first.size) {
                 for (indexSecond in j until partOfSecArray.size - 1)
                     second[indexSecond + i] = partOfSecArray[indexSecond]
                 break@loop
-            }
-            else {
+            } else {
                 for (indexFirst in i until first.size - 1)
                     second[indexFirst + j] = first[indexFirst]
                 break@loop

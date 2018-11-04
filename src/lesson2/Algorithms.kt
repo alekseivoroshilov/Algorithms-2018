@@ -3,6 +3,7 @@
 package lesson2
 
 import java.io.File
+import java.lang.IllegalArgumentException
 
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
@@ -81,6 +82,7 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  */
 //T = O(n), R = O(menNumber)
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
+    if (choiceInterval < 1 || menNumber < 1) throw IllegalArgumentException()
     var marker = 1
     for (i in 1.. menNumber) marker = (marker + choiceInterval) % i
 
