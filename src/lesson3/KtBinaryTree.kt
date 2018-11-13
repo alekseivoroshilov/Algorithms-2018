@@ -16,6 +16,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         var left: Node<T>? = null
 
         var right: Node<T>? = null
+
     }
 
     override fun add(element: T): Boolean {
@@ -54,8 +55,82 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Удаление элемента в дереве
      * Средняя
      */
-    override fun remove(element: T): Boolean {
-        TODO()
+    override fun remove(element: T): Boolean { //T = O(N*logN) , R = O(N*logN)
+        if (find(element) == null) return false
+        var current = root ?: return false
+        var parent = root!! //нам нужен родитель, потому что можно менять только значения ветвей(узлов)
+        size--
+
+        while (current.value != element) {
+            parent = current
+            current = if (current.value > element)
+                current.left ?: return false
+            else
+                current.right ?: return false
+        }
+
+        when { //нод и узел - синонимы
+            //у удаляемого нода нет двух узлов -> остаётся лишь просто установить его значение в null
+            current.left == null && current.right == null -> setNode(current, parent, null)
+            current.left == null -> setNode(current, parent, current.right) //нет левого узла
+            current.right == null -> setNode(current, parent, current.left) //нет правого узла
+            else -> { //если у удаляемого нода есть и левый, и правый узлы
+                var minNode = current.right ?: return false
+                var parentMinNode = current.right!!
+                while (minNode.left != null) { // связано с алгоритмом удаления узла с двумя дочерними узлами
+                    //левая цепочка правого нода у удаляемого узла ближе по значению к value удаляемого нода
+                    //поэтому эта левая цепочка сдвигается, заполняя удаляемый нод
+                    parentMinNode = minNode
+                    val left = minNode.left ?: return false
+                    minNode = left
+                }
+                when { //тоже рассматриваются несколько случаев
+                    current == root && parentMinNode == minNode -> { //у минимального нода нет левой цепочки//del root
+                        root = minNode
+                        minNode.left = root!!.left
+                    }
+                    current == root && parentMinNode != minNode -> { //у минимального нода есть левая цепочка//del root
+                        parentMinNode.left = minNode.right
+                        root = minNode
+                        minNode.left = current.left
+                        minNode.right = current.right
+                    }
+                    parentMinNode == minNode -> setNode(current, parent, minNode) //у минимального нода нет левой цепочки
+                    else -> { //если удаляется не root нод//есть левая и правая цепочки//
+                        parentMinNode.left = minNode.right
+                        minNode.right = current.right
+                        minNode.left = current.left
+                        setNode(current, parent, minNode)
+                    }
+                }
+                minNode.left = current.left //в конце-концов, минимальный нод в левой цепочке правого узла
+                // у удаляемого нода становится на место удаляемого нода
+                //хорошо показано тут: https://neerc.ifmo.ru/wiki/images/thumb/d/dd/Bst_del3.png/900px-Bst_del3.png
+            }
+        }
+        return true
+    }
+
+
+    private fun minElemSubtree(t: Node<T>): Node<T> {
+        if (t.left != null)
+            return minElemSubtree(t.left!!)
+        return t
+    }
+
+    private fun maxElemSubtree(t: Node<T>): Node<T> {
+        if (t.right != null)
+            return maxElemSubtree(t.right!!)
+        return t
+    }
+
+    private fun setNode(current: Node<T>, parent: Node<T>, set: Node<T>?) { // установить нод(текущий,
+        // родитель текущего, новое значение нода)
+        when (current) {
+            root -> root = set //если текущий нод сфокусирован на root-нод,  установить на set
+            parent.left -> parent.left = set //если текущий нод - левый узел его родителя -> смена значения левого узла
+            parent.right -> parent.right = set
+        }
     }
 
     override operator fun contains(element: T): Boolean {
@@ -83,8 +158,26 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Поиск следующего элемента
          * Средняя
          */
-        private fun findNext(): Node<T>? {
-            TODO()
+        private fun findNext(): Node<T>? { //без этой функции не проверить fun remove(element:T)
+            if (root == null) return null
+            if (current == null) return find(first())
+            val point = current!! //стартуем с текущего нода, ставя маркер на него
+            if (point.right != null) return minElemSubtree(point.right!!) //функция описана выше.
+            // ищет минимальный элемент в цепочке
+            else { //если от тек
+                var searchPoint: Node<T>? = null
+                var parent = root
+                while (parent != point) {
+                    val comparison = point.value.compareTo(parent!!.value);
+                    if (comparison > 0) {
+                        parent = parent.right
+                    } else {
+                        searchPoint = parent
+                        parent = parent.left
+                    }
+                }
+                return searchPoint
+            }
         }
 
         override fun hasNext(): Boolean = findNext() != null
