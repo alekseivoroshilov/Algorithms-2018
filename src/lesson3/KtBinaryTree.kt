@@ -56,7 +56,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Удаление элемента в дереве
      * Средняя
      */
-    override fun remove(element: T): Boolean { //T = O(N*logN) , R = O(N*logN)
+    override fun remove(element: T): Boolean { //T = O(N), R = O(1)
         if (find(element) == null) return false
         var current = root ?: return false
         var parent = root!! //нам нужен родитель, потому что можно менять только значения ветвей(узлов)
@@ -113,7 +113,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     }
 
 
-    private fun minElemSubtree(t: Node<T>): Node<T> {
+    private fun minElemSubtree(t: Node<T>): Node<T> {//T = O(N), R = O(N)
         if (t.left != null)
             return minElemSubtree(t.left!!)
         return t
@@ -159,13 +159,13 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Поиск следующего элемента
          * Средняя
          */
-        private fun findNext(): Node<T>? { //без этой функции не проверить fun remove(element:T)
+        private fun findNext(): Node<T>? {
             if (root == null) return null
             if (current == null) return find(first())
             val point = current!! //стартуем с текущего нода, ставя маркер на него
             if (point.right != null) return minElemSubtree(point.right!!) //функция описана выше.
             // ищет минимальный элемент в цепочке
-            else { //если от тек
+            else { //если от текущего нода идёт цепочка
                 var searchPoint: Node<T>? = null
                 var parent = root!!
                 while (parent != point) {
@@ -179,7 +179,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
                 }
                 return searchPoint
             }
-        }//T = O(N*logN) , R = O(N*logN)
+        }////T = O(N), R = O(1)
 
         override fun hasNext(): Boolean = findNext() != null
 
@@ -192,7 +192,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Удаление следующего элемента
          * Сложная
          */
-        override fun remove() {
+        override fun remove() { //T = O(N), R = O(1)
             val point = current
             current = findNext()
             if (point != null) remove(point.value)
