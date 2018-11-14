@@ -1,5 +1,6 @@
 package lesson3
 
+import java.lang.IllegalArgumentException
 import java.util.SortedSet
 import kotlin.NoSuchElementException
 
@@ -166,19 +167,19 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
             // ищет минимальный элемент в цепочке
             else { //если от тек
                 var searchPoint: Node<T>? = null
-                var parent = root
+                var parent = root!!
                 while (parent != point) {
-                    val comparison = point.value.compareTo(parent!!.value);
+                    val comparison = point.value.compareTo(parent.value);
                     if (comparison > 0) {
-                        parent = parent.right
+                        parent = parent.right!!
                     } else {
                         searchPoint = parent
-                        parent = parent.left
+                        parent = parent.left!!
                     }
                 }
                 return searchPoint
             }
-        }
+        }//T = O(N*logN) , R = O(N*logN)
 
         override fun hasNext(): Boolean = findNext() != null
 
@@ -192,7 +193,9 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Сложная
          */
         override fun remove() {
-            TODO()
+            val point = current
+            current = findNext()
+            if (point != null) remove(point.value)
         }
     }
 
