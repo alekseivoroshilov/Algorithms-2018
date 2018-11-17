@@ -170,16 +170,18 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
                 var parent = root!!
                 while (parent != point) {
                     val comparison = point.value.compareTo(parent.value);
-                    if (comparison > 0) {
+                    if (comparison > 0 && parent.right != null) {
                         parent = parent.right!!
-                    } else {
+                    } else if (parent.left != null) {
                         searchPoint = parent
                         parent = parent.left!!
+                    } else {
+                        parent = point
                     }
                 }
                 return searchPoint
             }
-        }////T = O(N), R = O(1)
+        }//T = O(log(N)), R = O(1)
 
         override fun hasNext(): Boolean = findNext() != null
 
@@ -192,10 +194,8 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Удаление следующего элемента
          * Сложная
          */
-        override fun remove() { //T = O(N), R = O(1)
-            val point = current
-            current = findNext()
-            if (point != null) remove(point.value)
+        override fun remove() { //T = O(log(N)), R = O(1)
+            if (current != null) remove(current!!.value)
         }
     }
 
