@@ -2,6 +2,8 @@
 
 package lesson6
 
+import java.io.File
+
 /**
  * Наибольшая общая подпоследовательность.
  * Средняя
@@ -53,8 +55,47 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
  *
  * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
  */
-fun shortestPathOnField(inputName: String): Int {
-    TODO()
+//По условиям задачи в 5ом уроке, одна задача может быть зачтена в 6-ом уроке
+fun shortestPathOnField(inputName: String): Int { //T = O(N * M) R = (2 * N * M)
+    val input = File(inputName).readLines()
+            .map { it -> it.split(' ').map { it.toInt() }.toIntArray() }
+            .toTypedArray() //дано поле (N, M)
+    val m = input.size - 1
+    val n = input[0].size - 1
+    val summap = Array(m + 1) { IntArray(n + 1) { 0 } } //такая карта, в которой каждая клетка
+    // равна сумме минимальных пройденных путей
+    var buf = 0
+
+    for (i in 0..n){
+        buf += input[0][i]
+        summap[0][i] = buf
+    }
+
+    buf = 0
+    for (j in 0..m){
+        buf += input[j][0]
+        summap[j][0] = buf
+    }
+    //by this moment
+/* input
+ * 0 2 3 2 4 1
+ * 1 5 3 4 6 2
+ * 2 6 2 5 1 3
+ * 1 4 3 2 6 2
+ * 4 2 3 1 5 0
+*/
+/* temp
+ * 0 2 5 7 11 12
+ * 1 5 3 4 6  2
+ * 3 6 2 5 1  3
+ * 4 4 3 2 6  2
+ * 8 2 3 1 5  0
+*/
+    for (i in 1..m)
+        for (j in 1..n)
+            summap[i][j] = input[i][j] + minOf(summap[i - 1][j - 1], summap[i - 1][j], summap[i][j - 1])
+
+    return summap[m][n]
 }
 
 // Задачу "Максимальное независимое множество вершин в графе без циклов"

@@ -38,7 +38,7 @@ fun Graph.findEulerLoop(): List<Graph.Edge> { //T = O(Vertices + Edges),
         val degree = (getNeighbors(vertex)).size
         if (degree % 2 == 1) cycleExist = false
     }
-    if (!cycleExist) {println("problem?"); return emptyList()}
+    if (!cycleExist) return emptyList()
 
     val start = vertices.elementAt(0)
     val queue = Stack<Graph.Vertex>()
@@ -50,15 +50,15 @@ fun Graph.findEulerLoop(): List<Graph.Edge> { //T = O(Vertices + Edges),
     val list = mutableListOf<Graph.Vertex>()
     while (!queue.isEmpty()) {
         val peek = queue.peek()
-        loop@ for (vertex in getNeighbors(peek))
-            if (getConnection(peek, vertex) in untouchedEdges) {
+        loop@ for (vertex in getNeighbors(peek)) {
+            val edge = getConnection(peek, vertex)
+            if (edge in untouchedEdges) {
                 queue.push(vertex)
-                untouchedEdges.remove(getConnection(peek, vertex))
+                untouchedEdges.remove(edge)
                 break@loop
             }
-        if (peek == queue.peek()){
-            list.add(queue.pop())
         }
+        if (peek == queue.peek()) list.add(queue.pop())
     }
     val result = mutableListOf<Graph.Edge>()
     for (i in 1 until list.size) {
@@ -66,8 +66,6 @@ fun Graph.findEulerLoop(): List<Graph.Edge> { //T = O(Vertices + Edges),
     }
     return result.toList()
 }
-
-
 
 
 /**
@@ -132,7 +130,7 @@ fun startDFS(graph: Graph, start: Graph.Vertex, setOfVertexLists: List<MutableSe
     var counter = 0
     val visited = mutableSetOf<Graph.Vertex>() // массив посещённых вершин
     val result = setOfVertexLists
-    fun dfs(start: Graph.Vertex):Set<Graph.Vertex>{
+    fun dfs(start: Graph.Vertex): Set<Graph.Vertex> {
         val neighboursForVertex = graph.getNeighbors(start).filter { it !in visited } //поиск соседей, которых не посетили
         visited.add(start)
         neighboursForVertex.forEach {
@@ -146,6 +144,7 @@ fun startDFS(graph: Graph, start: Graph.Vertex, setOfVertexLists: List<MutableSe
     }
     return dfs(start)
 }
+
 fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
     val start = vertices.elementAt(0)
     val setOfVertexLists = listOf(mutableSetOf<Graph.Vertex>(), mutableSetOf())
